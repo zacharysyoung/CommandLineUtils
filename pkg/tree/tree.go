@@ -4,7 +4,6 @@ package tree
 
 import (
 	"fmt"
-	"io"
 	"slices"
 	"strings"
 )
@@ -16,13 +15,12 @@ type Node struct {
 	Children []*Node
 }
 
-func emptyLine(x string) bool { return strings.TrimSpace(x) == "" }
+func isEmpty(x string) bool { return strings.TrimSpace(x) == "" }
 
-// Parse parses tree into a Node.  For errors, it returns either
-// EmptyTree or NonDirRoot.
+// Parse parses tree into a Node.
 func Parse(tree string) (*Node, error) {
 	lines := strings.Split(tree, "\n")
-	lines = slices.DeleteFunc(lines, emptyLine)
+	lines = slices.DeleteFunc(lines, isEmpty)
 	if len(lines) == 0 {
 		return nil, fmt.Errorf("empty tree")
 	}
@@ -49,20 +47,7 @@ func Parse(tree string) (*Node, error) {
 	return root, nil
 }
 
-func (n *Node) print(w io.Writer, indent string) {
-	prefix := "(f)"
-	if n.IsDir {
-		prefix = "(d)"
-	}
-	fmt.Fprintf(w, "%s%s %s\n", indent, prefix, n.Name)
-	if len(n.Children) == 0 {
-		return
-	}
-	for _, x := range n.Children {
-		x.print(w, indent+"  ")
-	}
-}
-
+// parse parses a single line
 func parse(line string) (name string, isDir bool, depth int) {
 	i := strings.Index(line, "-")
 	if i < 0 {
@@ -70,6 +55,20 @@ func parse(line string) (name string, isDir bool, depth int) {
 		isDir = true
 	}
 	depth = i
-	name = line[i+2:]
+	name = strings.TrimSpace(line[i+2:])
 	return
+}
+
+func (n *Node) String() string {
+	if !n.IsDir {
+		return n.Name
+	}
+
+	children, sep := "", ""
+	for _, c := range n.Children {
+		children += sep + c.String()
+		sep = " "
+	}
+
+	return fmt.Sprintf("%s[%s]", n.Name, children)
 }
