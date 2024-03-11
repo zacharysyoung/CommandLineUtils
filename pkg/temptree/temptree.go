@@ -107,10 +107,13 @@ type File struct {
 	children []File
 }
 
+// F wraps name in a File
 func F(name string) File {
 	return File{name, nil}
 }
 
+// D creates a directory File with name, and children files.  If files
+// is nil, the directory is empty.
 func D(name string, files ...File) File {
 	if files == nil {
 		files = []File{}
