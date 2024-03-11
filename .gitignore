@@ -1,0 +1,5 @@
+bin
+
+cmds/lspath/lspath
+cmds/searchup/searchup
+cmds/tree/tree

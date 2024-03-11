@@ -7,38 +7,29 @@ import (
 	"testing"
 )
 
-func TestPrint(t *testing.T) {
-	for _, tc := range []struct {
-		f    File
-		want string
-	}{
-		{
-			f: D("root",
-				F("f1")),
-			want: "root[f1]",
-		},
-		{
-			f: D("root",
-				F("f1"),
-				D("d2",
-					D("d3")),
-				F("f4"),
-			),
-			want: "root[f1 d2[d3[]] f4]",
-		},
-	} {
-		if got := tc.f.print(); got != tc.want {
-			t.Errorf("%v.print() = %s; want %s", tc.f, got, tc.want)
-		}
+func TestMakeRemove(t *testing.T) {
+	tree := NewTree(F("foo"), D("bar", F("baz")))
+
+	tempPath, err := tree.MakeTemp()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if err := tree.Remove(); err != nil {
+		t.Fatal("could not cleanly remove temp tree:", err)
+	}
+
+	if _, err := os.Lstat(tempPath); os.IsExist(err) {
+		t.Errorf("found temp dir %s; it should have been removed", tempPath)
 	}
 }
 
-func TestMakeTemp(t *testing.T) {
+func TestMakeStructure(t *testing.T) {
 	files := []File{
 		F("f1"),
 		D("d2",
 			F("f3"),
-			D("d4")),
+			D("d4")), // empty dir
 	}
 	wants := map[string]bool{
 		"f1":    false,
@@ -87,6 +78,32 @@ func TestMakeTemp(t *testing.T) {
 
 	if err := tree.Remove(); err != nil {
 		t.Fatal(err)
+	}
+}
+
+func TestPrint(t *testing.T) {
+	for _, tc := range []struct {
+		f    File
+		want string
+	}{
+		{
+			f: D("root",
+				F("f1")),
+			want: "root[f1]",
+		},
+		{
+			f: D("root",
+				F("f1"),
+				D("d2",
+					D("d3")),
+				F("f4"),
+			),
+			want: "root[f1 d2[d3[]] f4]",
+		},
+	} {
+		if got := tc.f.print(); got != tc.want {
+			t.Errorf("%v.print() = %s; want %s", tc.f, got, tc.want)
+		}
 	}
 }
 
