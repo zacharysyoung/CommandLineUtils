@@ -105,22 +105,25 @@ func TestString(t *testing.T) {
 }
 
 func TestDebug(t *testing.T) {
-	tree1, _, _ := NewTree(F("f1"), F("f2"), F("f3"))
-	want1 := `NewTree(F("f1"), F("f2"), F("f3"))`
-
-	tree2, _, _ := NewTree(F("f1"), D("d2", F("f3"), D("d4")))
-	want2 := `NewTree(F("f1"), D("d2", F("f3"), D("d4")))`
 
 	for _, tc := range []struct {
-		tree *Tree
-		want string
+		files []File
+		want  string
 	}{
-		{tree1, want1},
-		{tree2, want2},
+		{
+			files: []File{F("f1"), F("f2"), F("f3")},
+			want:  `NewTree(F("f1"), F("f2"), F("f3"))`,
+		},
+
+		{
+			files: []File{F("f1"), D("d2", F("f3"), D("d4"))},
+			want:  `NewTree(F("f1"), D("d2", F("f3"), D("d4")))`,
+		},
 	} {
-		if got := tc.tree.Debug(); got != tc.want {
-			t.Errorf("\n%v.Debug()\n  got %s\n want %s", tc.tree.files, got, tc.want)
+		tree, _, _ := NewTree(tc.files...)
+		if got := tree.Debug(); got != tc.want {
+			t.Errorf("\n%v.Debug()\n  got %s\n want %s", tree.files, got, tc.want)
 		}
-		tc.tree.Remove()
+		tree.Remove()
 	}
 }

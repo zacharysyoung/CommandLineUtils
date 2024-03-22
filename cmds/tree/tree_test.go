@@ -59,11 +59,11 @@ func popFirstLine(s string) (first, rem string) {
 
 func TestPrint(t *testing.T) {
 	testCases := []struct {
-		tree *temptree.Tree
-		want string
+		files []temptree.File
+		want  string
 	}{
 		{
-			tree: temptree.NewTree(F("foo"), F("bar"), F("baz")),
+			files: []temptree.File{F("foo"), F("bar"), F("baz")},
 			want: `+ Some temp dir
   - bar
   - baz
@@ -71,7 +71,7 @@ func TestPrint(t *testing.T) {
 `,
 		},
 		{
-			tree: temptree.NewTree(D("foo", F("bar"), F("baz"))),
+			files: []temptree.File{D("foo", F("bar"), F("baz"))},
 			want: `+ Some temp dir
   + foo
     - bar
@@ -82,7 +82,7 @@ func TestPrint(t *testing.T) {
 
 	buf := &bytes.Buffer{}
 	for _, tc := range testCases {
-		tempPath, err := tc.tree.MakeTemp()
+		tree, tempPath, err := temptree.NewTree(tc.files...)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -102,7 +102,7 @@ func TestPrint(t *testing.T) {
 			t.Errorf("printTree()\n  got %s\n want %s", got, tc.want)
 		}
 
-		if err = tc.tree.Remove(); err != nil {
+		if err = tree.Remove(); err != nil {
 			t.Fatal(err)
 		}
 	}
