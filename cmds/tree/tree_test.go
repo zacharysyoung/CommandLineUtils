@@ -13,7 +13,10 @@ import (
 // (not rooted at "/") by comparing the depth of the test paths
 // to the depth of the cwd.
 func TestGetDepthRelative(t *testing.T) {
-	cwdDepth := getDepth(".")
+	cwdDepth, err := getDepth(".")
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	for _, tc := range []struct {
 		path string
@@ -25,7 +28,11 @@ func TestGetDepthRelative(t *testing.T) {
 		{"foo/bar", 2},
 		{"./foo/bar", 2},
 	} {
-		if got := getDepth(tc.path); got-cwdDepth != tc.want {
+		got, err := getDepth(tc.path)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if got-cwdDepth != tc.want {
 			t.Errorf("getDepth(%s) = %d; want %d", tc.path, got, tc.want)
 		}
 	}
@@ -39,7 +46,11 @@ func TestGetDepthAbs(t *testing.T) {
 		{"/foo", 1},
 		{"/foo/bar", 2},
 	} {
-		if got := getDepth(tc.path); got != tc.want {
+		got, err := getDepth(tc.path)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if got != tc.want {
 			t.Errorf("getDepth(%s) = %d; want %d", tc.path, got, tc.want)
 		}
 	}
