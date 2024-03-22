@@ -1,13 +1,25 @@
-// Package temptree provides a simple minilanguage for creating
-// temporary file trees.
+// Package temptree creates temporary, ad-hoc file trees (for
+// testing) and can dispose of them when done.
 //
-// To create a tree that contains the files f1 and f6, the empty dir d2,
-// and the dir d3, with dir d4 below that, and the empty dir d5 below that:
+// Use the F() and D() funcs to create files and directories.
+// Both take a name argument. D can also take any number of
+// F, or none for an empty directory.
 //
-//	/f1
-//	/d2/
-//	/d3/d4/d5/
-//	/f6
+// To create the tree:
+//
+//	tempPath/root
+//	tempPath/root/foo
+//	tempPath/root/bar
+//	tempPath/root/baz
+//
+// run:
+//
+//	t := NewTree(D("root", F("foo"), F("bar"), D("baz")))
+//	p := t.MakeTemp()
+//
+// p=tempPath, foo and bar are files, and baz is an empty directory.
+//
+// Call t.Remove() to remove the tree on disk.
 package temptree
 
 import (
@@ -22,8 +34,10 @@ type Tree struct {
 	tempPath string
 }
 
-func NewTree(files ...File) *Tree {
-	return &Tree{files: files}
+func NewTree(files ...File) (tree *Tree, tempPath string, err error) {
+	tree = &Tree{files: files}
+	tempPath, err = tree.makeTemp()
+	return
 }
 
 func (t *Tree) Debug() string {
@@ -52,7 +66,7 @@ func (t *Tree) Debug() string {
 
 // Make creates a temp directory then recursively adds the files
 // in t underneath it.
-func (t *Tree) MakeTemp() (string, error) {
+func (t *Tree) makeTemp() (string, error) {
 	tempPath, err := os.MkdirTemp("", "")
 	if err != nil {
 		return "", err
@@ -121,17 +135,21 @@ func D(name string, files ...File) File {
 	return File{name, files}
 }
 
-// print a compact, diagnostic string for n.
-func (f *File) print() string {
+func (f File) String() string {
+	return f.print()
+}
+
+// print a compact, diagnostic string for f.
+func (f File) print() string {
 	if f.children == nil {
 		return f.name
 	}
 
-	children, sep := "", ""
-	for _, cf := range f.children {
-		children += sep + cf.print()
+	s, sep := "", ""
+	for _, x := range f.children {
+		s += sep + x.print()
 		sep = " "
 	}
 
-	return fmt.Sprintf("%s[%s]", f.name, children)
+	return fmt.Sprintf("%s[%s]", f.name, s)
 }

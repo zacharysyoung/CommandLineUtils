@@ -7,10 +7,8 @@ import (
 	"testing"
 )
 
-func TestMakeRemove(t *testing.T) {
-	tree := NewTree(F("foo"), D("bar", F("baz")))
-
-	tempPath, err := tree.MakeTemp()
+func TestRemove(t *testing.T) {
+	tree, tempPath, err := NewTree(F("foo"), D("bar", F("baz")))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -24,7 +22,7 @@ func TestMakeRemove(t *testing.T) {
 	}
 }
 
-func TestMakeStructure(t *testing.T) {
+func TestNewTree(t *testing.T) {
 	files := []File{
 		F("f1"),
 		D("d2",
@@ -38,8 +36,7 @@ func TestMakeStructure(t *testing.T) {
 		"d2/d4": true,
 	}
 
-	tree := NewTree(files...)
-	tempPath, err := tree.MakeTemp()
+	tree, tempPath, err := NewTree(files...)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -81,7 +78,7 @@ func TestMakeStructure(t *testing.T) {
 	}
 }
 
-func TestPrint(t *testing.T) {
+func TestString(t *testing.T) {
 	for _, tc := range []struct {
 		f    File
 		want string
@@ -101,30 +98,29 @@ func TestPrint(t *testing.T) {
 			want: "root[f1 d2[d3[]] f4]",
 		},
 	} {
-		if got := tc.f.print(); got != tc.want {
-			t.Errorf("%v.print() = %s; want %s", tc.f, got, tc.want)
+		if got := tc.f.String(); got != tc.want {
+			t.Errorf("got %s; want %s", got, tc.want)
 		}
 	}
 }
 
 func TestDebug(t *testing.T) {
-	testCases := []struct {
+	tree1, _, _ := NewTree(F("f1"), F("f2"), F("f3"))
+	want1 := `NewTree(F("f1"), F("f2"), F("f3"))`
+
+	tree2, _, _ := NewTree(F("f1"), D("d2", F("f3"), D("d4")))
+	want2 := `NewTree(F("f1"), D("d2", F("f3"), D("d4")))`
+
+	for _, tc := range []struct {
 		tree *Tree
 		want string
 	}{
-		{
-			tree: NewTree(F("f1"), F("f2"), F("f3")),
-			want: `NewTree(F("f1"), F("f2"), F("f3"))`,
-		},
-		{
-			tree: NewTree(F("f1"), D("d2", F("f3"), D("d4"))),
-			want: `NewTree(F("f1"), D("d2", F("f3"), D("d4")))`,
-		},
-	}
-
-	for _, tc := range testCases {
+		{tree1, want1},
+		{tree2, want2},
+	} {
 		if got := tc.tree.Debug(); got != tc.want {
 			t.Errorf("\n%v.Debug()\n  got %s\n want %s", tc.tree.files, got, tc.want)
 		}
+		tc.tree.Remove()
 	}
 }
