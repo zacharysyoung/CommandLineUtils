@@ -1,6 +1,16 @@
-// Search up the directory tree for occurrences of NAME
-// and print them.  Exits with status 1 if no occurrences
-// were found.
+// Copyright 2024 Zachary S Young.  All rights reserved.
+// Use of this source code is governed by an MIT
+// license that can be found in the LICENSE file.
+
+// Searchup searches upwards for a file.
+//
+// Usage:
+//
+// search [-h] [-first] NAME
+//
+// Searchup moves up the directory tree printing found
+// occurrences of NAME.  It exits with status 1 if no
+// occurrences were found.
 //
 // Use the -first flag to stop the search after the first
 // occurrence of NAME.

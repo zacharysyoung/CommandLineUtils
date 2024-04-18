@@ -1,4 +1,12 @@
-// Print directory tree starting at PATH.
+// Copyright 2024 Zachary S Young.  All rights reserved.
+// Use of this source code is governed by an MIT
+// license that can be found in the LICENSE file.
+
+// Tree prints the directory tree starting at PATH.
+//
+// Usage:
+//
+// tree [-h] [options] PATH
 package main
 
 import (
@@ -18,7 +26,7 @@ var (
 )
 
 func usage() {
-	fmt.Fprintln(os.Stderr, "usage: tree [-h] [-prefix] [-indent] PATH")
+	fmt.Fprintln(os.Stderr, "usage: tree [-h] [options] PATH")
 	flag.PrintDefaults()
 	os.Exit(2)
 }
