@@ -5,5 +5,9 @@ set -e
 rm -rf build
 mkdir build
 
-go build -o build/dos2unix ./cmds/dos2unix && cp build/dos2unix ~/bin
-go build -o build/unix2dos ./cmds/unix2dos && cp build/unix2dos ~/bin
+for cmd in \
+    dos2unix lspath searchup tree unix2dos
+do
+    echo $cmd
+    go build -o build/$cmd ./cmds/$cmd && cp build/$cmd ~/bin
+done

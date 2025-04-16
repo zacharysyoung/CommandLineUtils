@@ -108,16 +108,14 @@ func version() string {
 		}
 	}
 
-	s := cmdName
+	var s string
 	switch modified {
 	case true:
-		s += "\n"
 		s += "go:           " + goVer + "\n"
 		s += "vcs.revision: " + rev + "\n"
-		s += "vcs.time:     " + t.Format(time.RFC3339) + "\n"
-		s += "local-build:  " + time.Now().Format(time.RFC3339)
+		s += "vcs.time:     " + t.Format(time.RFC3339)
 	default:
-		s += ":" + rev + ":" + goVer
+		s = cmdName + ":" + rev + ":" + goVer
 	}
 
 	return s
