@@ -11,9 +11,9 @@ import (
 )
 
 func usage() {
-	fmt.Fprintln(os.Stderr, `usage: unix2dos [-v] [file]
+	fmt.Fprintln(os.Stderr, `usage: dos2unix [-v] [file]
 
-Reads file (or stdin) and converts all line feeds (LF) to carriage return line feeds (CRLF).`)
+Reads file (or stdin) and converts all carriage return line feeds (CRLF) to line feeds (LF).`)
 	flag.PrintDefaults()
 	os.Exit(2)
 }
@@ -57,18 +57,10 @@ func run(in io.Reader, out io.Writer) error {
 	if err != nil {
 		return err
 	}
-	s := string(b)
 
-	const (
-		crlf = "\r\n"
-		lf   = "\n"
-	)
-	crlfSegments := strings.Split(s, crlf)
-	for i := range crlfSegments {
-		crlfSegments[i] = strings.ReplaceAll(crlfSegments[i], lf, crlf)
-	}
-
-	_, err = io.WriteString(out, strings.Join(crlfSegments, crlf))
+	_, err = io.WriteString(
+		out,
+		strings.ReplaceAll(string(b), "\r\n", "\n"))
 	if err != nil {
 		return err
 	}
@@ -100,7 +92,7 @@ func version() string {
 		}
 	}
 
-	s := "unix2dos"
+	s := "dos2unix"
 	switch modified {
 	case true:
 		s += "\n"

@@ -13,21 +13,16 @@ func Test_run(t *testing.T) {
 		pre  = func(s string) string { return x(x(s, "<CRLF>", "\r\n"), "<LF>", "\n") }
 		post = func(s string) string { return x(x(s, "\r\n", "<CRLF>"), "\n", "<LF>") }
 	)
-
 	for _, tc := range []struct {
 		in, want string
 	}{
 		{
-			"foo<LF>bar",
 			"foo<CRLF>bar",
+			"foo<LF>bar",
 		},
 		{
+			"foo<LF>bar<CRLF>",
 			"foo<LF>bar<LF>",
-			"foo<CRLF>bar<CRLF>",
-		},
-		{
-			"foo<CRLF>bar<LF>",
-			"foo<CRLF>bar<CRLF>",
 		},
 	} {
 		buf := &bytes.Buffer{}
@@ -41,5 +36,4 @@ func Test_run(t *testing.T) {
 		}
 
 	}
-
 }
