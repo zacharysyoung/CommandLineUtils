@@ -10,10 +10,18 @@ import (
 	"time"
 )
 
-func usage() {
-	fmt.Fprintln(os.Stderr, `usage: unix2dos [-v] [file]
+const cmdName = "unix2dos"
 
-Reads file (or stdin) and converts all line feeds (LF) to carriage return line feeds (CRLF).`)
+func usage() {
+	fmt.Fprintf(os.Stderr, `usage: %s [-v] [file]
+
+Transforms the input, converting all line feeds (LF) to carriage return line feeds (CRLF).
+
+Reads from file, or stdin, and prints to stdout.
+
+`,
+		cmdName)
+
 	flag.PrintDefaults()
 	os.Exit(2)
 }
@@ -100,7 +108,7 @@ func version() string {
 		}
 	}
 
-	s := "unix2dos"
+	s := cmdName
 	switch modified {
 	case true:
 		s += "\n"
